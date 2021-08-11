@@ -59,7 +59,6 @@ import {
   ICheckoutProgress,
   IFetchProgress,
   IRevertProgress,
-  ICherryPickProgress,
   IMultiCommitOperationProgress,
 } from '../../models/progress'
 import { Popup, PopupType } from '../../models/popup'
@@ -2106,7 +2105,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
-    const { step } = multiCommitOperationState
+    const { step, operationDetail } = multiCommitOperationState
     if (step.kind !== MultiCommitOperationStepKind.ShowConflicts) {
       return
     }
@@ -2124,7 +2123,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       const { currentTip } = conflictState
       this.repositoryStateCache.updateMultiCommitOperationState(
         repository,
-        () => ({ currentTip })
+        () => ({ operationDetail: { ...operationDetail, currentTip } })
       )
     }
   }
@@ -6242,7 +6241,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.repositoryStateCache.updateCherryPickState(repository, () => {
       return {
         progress: {
-          kind: 'cherryPick',
+          kind: 'multiCommitOperation',
           value: 0,
           position: 1,
           totalCommitCount: commits.length,
@@ -6266,7 +6265,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
     await this._refreshRepository(repository)
 
-    const progressCallback = (progress: ICherryPickProgress) => {
+    const progressCallback = (progress: IMultiCommitOperationProgress) => {
       this.repositoryStateCache.updateCherryPickState(repository, () => ({
         progress,
       }))
@@ -6406,7 +6405,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     files: ReadonlyArray<WorkingDirectoryFileChange>,
     manualResolutions: ReadonlyMap<string, ManualConflictResolution>
   ): Promise<CherryPickResult> {
-    const progressCallback = (progress: ICherryPickProgress) => {
+    const progressCallback = (progress: IMultiCommitOperationProgress) => {
       this.repositoryStateCache.updateCherryPickState(repository, () => ({
         progress,
       }))
@@ -6920,8 +6919,6 @@ export class AppStore extends TypedBaseStore<IAppState> {
         value: 0,
       },
       userHasResolvedConflicts: false,
-      commits,
-      currentTip: targetBranch.tip.sha,
       originalBranchTip: targetBranch.tip.sha,
       targetBranch,
     })

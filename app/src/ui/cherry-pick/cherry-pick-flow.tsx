@@ -7,11 +7,9 @@ import {
   CherryPickStepKind,
   ConfirmAbortStep,
 } from '../../models/cherry-pick'
-import { ICherryPickProgress } from '../../models/progress'
 
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
-import { ChooseTargetBranchDialog } from './choose-target-branch'
 import { CherryPickProgressDialog } from './cherry-pick-progress-dialog'
 import { CommitOneLine } from '../../models/commit'
 import { WorkingDirectoryStatus } from '../../models/status'
@@ -19,13 +17,15 @@ import { getResolvedFiles } from '../../lib/status'
 import { ConfirmCherryPickAbortDialog } from './confirm-cherry-pick-abort-dialog'
 import { CreateBranch } from '../create-branch'
 import { ConflictsDialog } from '../multi-commit-operation/conflicts-dialog'
+import { IMultiCommitOperationProgress } from '../../models/progress'
+import { ChooseTargetBranchDialog } from '../multi-commit-operation/choose-branch/choose-target-branch'
 
 interface ICherryPickFlowProps {
   readonly repository: Repository
   readonly dispatcher: Dispatcher
   readonly step: CherryPickFlowStep
   readonly commits: ReadonlyArray<CommitOneLine>
-  readonly progress: ICherryPickProgress | null
+  readonly progress: IMultiCommitOperationProgress | null
   readonly emoji: Map<string, string>
 
   /**
